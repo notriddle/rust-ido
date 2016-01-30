@@ -102,8 +102,8 @@ macro_rules! ido {
         }
     }};
     { $val: stmt; $($rest: tt)* } => {{ $val; ido!{ $($rest)* } }};
-    { $val: expr } => { From::from($val) };
-    { } => { From::from(()) };
+    { $val: expr } => { $val };
+    { } => { () };
 }
 
 /// The result of a pseudo-monadic bind. If `Empty` is returned, the `ido!`
