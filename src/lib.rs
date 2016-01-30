@@ -14,6 +14,8 @@
 //!     assert_eq!(result, Err(1));
 //!     let val = ido!{
 //!         let a =<< Some(2);
+//!         // Notice that the if statement needs to end in a semicolon.
+//!         if a == 2 { println!("Cool!") } else { unreachable!() };
 //!         Some(a + 2)
 //!     };
 //!     assert_eq!(val, Some(4));
