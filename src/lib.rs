@@ -7,13 +7,13 @@
 //!     #[macro_use] extern crate ido;
 //!     # fn main() {
 //!     let result = ido!{
-//!         x =<< Ok(1);
-//!         _ =<< Err::<usize, usize>(x);
+//!         let x =<< Ok(1);
+//!         let _ =<< Err::<usize, usize>(x);
 //!         Ok(unreachable!())
 //!     };
 //!     assert_eq!(result, Err(1));
 //!     let val = ido!{
-//!         a =<< Some(2);
+//!         let a =<< Some(2);
 //!         Some(a + 2)
 //!     };
 //!     assert_eq!(val, Some(4));
@@ -62,33 +62,7 @@ impl<T, U, E> Bindable<Result<U, E>> for Result<T, E> {
 
 #[macro_export]
 macro_rules! ido {
-    { mut $var: ident =<< $val: expr; $($rest: tt)* } => {{
-        let v = $val;
-        match $crate::Bindable::bind(v) {
-            $crate::Binding::Value(mut $var, state) => {
-                let mut v = ido!{ $($rest)* };
-                $crate::Mergeable::merge(&mut v, state);
-                v
-            },
-            $crate::Binding::Empty(v) => {
-                From::from(v)
-            },
-        }
-    }};
-    { _ =<< $val: expr; $($rest: tt)* } => {{
-        let v = $val;
-        match $crate::Bindable::bind(v) {
-            $crate::Binding::Value(_, state) => {
-                let mut v = ido!{ $($rest)* };
-                $crate::Mergeable::merge(&mut v, state);
-                v
-            },
-            $crate::Binding::Empty(v) => {
-                From::from(v)
-            },
-        }
-    }};
-    { $var: ident =<< $val: expr; $($rest: tt)* } => {{
+    { let $var: pat =<< $val: expr; $($rest: tt)* } => {{
         let v = $val;
         match $crate::Bindable::bind(v) {
             $crate::Binding::Value($var, state) => {
@@ -123,7 +97,7 @@ mod test {
     #[test]
     pub fn complete_option() {
         assert_eq!(ido!{
-            x =<< Some(1);
+            let x =<< Some(1);
             Some(x+1)
         }, Some(2));
     }
@@ -131,8 +105,8 @@ mod test {
     #[test]
     pub fn early_return_option() {
         assert_eq!(ido!{
-            x =<< Some(1);
-            y =<< None as Option<usize>;
+            let x =<< Some(1);
+            let y =<< None as Option<usize>;
             Some(x+1)
         }, None);
     }
@@ -140,7 +114,7 @@ mod test {
     pub fn complete() {
         let r: Result<usize, ()> = Ok(1);
         assert_eq!(ido!{
-            x =<< r;
+            let x =<< r;
             Ok(x+1)
         }, Ok(2));
     }
@@ -148,8 +122,8 @@ mod test {
     #[test]
     pub fn early_return() {
         assert_eq!(ido!{
-            x =<< Ok(1);
-            y =<< Err::<usize, usize>(x);
+            let x =<< Ok(1);
+            let y =<< Err::<usize, usize>(x);
             Ok(2)
         }, Err(1));
     }
@@ -170,9 +144,9 @@ mod test {
             }
         }
         let log = ido!{
-            a =<< Logger(1, vec!["This".into()]);
-            a =<< Logger(a+1, vec!["is".into()]);
-            a =<< Logger(a+1, vec!["overly".into()]);
+            let a =<< Logger(1, vec!["This".into()]);
+            let a =<< Logger(a+1, vec!["is".into()]);
+            let a =<< Logger(a+1, vec!["overly".into()]);
             Logger(a+1, vec!["complicated".into()])
         };
         assert_eq!(log.1, vec![Cow::Borrowed("This"), "is".into(), "overly".into(), "complicated".into()]);

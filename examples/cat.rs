@@ -11,10 +11,10 @@ pub fn main() {
     let mut stdout = stdout.lock();
     for ref file_name in args {
         let result = ido!{
-            file =<< fs::OpenOptions::new().read(true).open(file_name);
+            let file =<< fs::OpenOptions::new().read(true).open(file_name);
             let mut reader = io::BufReader::new(file);
             let mut buf = Vec::new();
-            _ =<< reader.read_to_end(&mut buf);
+            let _ =<< reader.read_to_end(&mut buf);
             stdout.write_all(&buf[..])
         };
         if let Err(e) = result {
