@@ -160,6 +160,20 @@ mod test {
         assert_eq!(it, 5);
     }
     #[test]
+    pub fn braces() {
+        ido!{
+            let a =<< {
+                struct Cool;
+                Some(Cool)
+            };
+            {
+                struct Cooler;
+                Cooler
+            };
+            Some(a)
+        };
+    }
+    #[test]
     pub fn state_threading() {
         struct Logger<T>(T, Vec<Cow<'static, str>>);
         impl<T> Bindable<Logger<T>> for Logger<T> {
