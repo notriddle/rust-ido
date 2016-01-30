@@ -128,6 +128,36 @@ mod test {
         }, Err(1));
     }
     #[test]
+    pub fn function_call() {
+        assert_eq!(ido!{
+            let x =<< Some(1);
+            ::std::env::args();
+            Some(x)
+        }, Some(1));
+    }
+    #[test]
+    #[allow(unused)]
+    pub fn return_out() {
+        let _: Option<usize> = ido!{
+            return;
+            Some(unreachable!())
+        };
+    }
+    #[test]
+    pub fn break_out() {
+        let mut it = 0;
+        for i in 0..10 {
+            it = i;
+            let y = ido!{
+                let x =<< Some(i);
+                if i == 5 { break };
+                Some(x)
+            };
+            assert_eq!(y, Some(i));
+        }
+        assert_eq!(it, 5);
+    }
+    #[test]
     pub fn state_threading() {
         struct Logger<T>(T, Vec<Cow<'static, str>>);
         impl<T> Bindable<Logger<T>> for Logger<T> {
